@@ -1,154 +1,104 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br />
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener"
-        >vue-cli documentation</a
-      >.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel"
-          target="_blank"
-          rel="noopener"
-          >babel</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa"
-          target="_blank"
-          rel="noopener"
-          >pwa</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-router"
-          target="_blank"
-          rel="noopener"
-          >router</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-vuex"
-          target="_blank"
-          rel="noopener"
-          >vuex</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint"
-          target="_blank"
-          rel="noopener"
-          >eslint</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-unit-jest"
-          target="_blank"
-          rel="noopener"
-          >unit-jest</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-e2e-nightwatch"
-          target="_blank"
-          rel="noopener"
-          >e2e-nightwatch</a
-        >
-      </li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li>
-        <a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a>
-      </li>
-      <li>
-        <a href="https://forum.vuejs.org" target="_blank" rel="noopener"
-          >Forum</a
-        >
-      </li>
-      <li>
-        <a href="https://chat.vuejs.org" target="_blank" rel="noopener"
-          >Community Chat</a
-        >
-      </li>
-      <li>
-        <a href="https://twitter.com/vuejs" target="_blank" rel="noopener"
-          >Twitter</a
-        >
-      </li>
-      <li>
-        <a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a>
-      </li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li>
-        <a href="https://router.vuejs.org" target="_blank" rel="noopener"
-          >vue-router</a
-        >
-      </li>
-      <li>
-        <a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a>
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-devtools#vue-devtools"
-          target="_blank"
-          rel="noopener"
-          >vue-devtools</a
-        >
-      </li>
-      <li>
-        <a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener"
-          >vue-loader</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/awesome-vue"
-          target="_blank"
-          rel="noopener"
-          >awesome-vue</a
-        >
-      </li>
-    </ul>
+<v-app>
+  <div>
+  <v-container>
+    <v-layout text-center wrap>
+      <v-flex xs12>
+        <v-row>
+          <v-col class="d-flex" cols="12" sm="6">
+            <v-select
+              :items="WorkoutItems"
+              :menu-props="{ top: true, offsetY: true }"
+              label="Select A Muscle"
+              v-model="workout_Select"
+            ></v-select>
+          </v-col>
+
+          <v-col class="d-flex" cols="12" sm="6">
+            <v-btn dark color="green" @click="getWorkouts()"> Update</v-btn>
+          </v-col>
+
+          <v-col class="d-flex" cols="12" sm="6">
+            <v-btn dark color="red" @click="createWorkout()">
+              Create Workout</v-btn
+            >
+          </v-col>
+        </v-row>
+      </v-flex>
+      <v-flex xs12>
+        <v-data-table
+          :headers="Workoutheaders"
+          :items="this.workout_get"
+          item-key="index"
+          class="elevation-1"
+        ></v-data-table>
+      </v-flex>
+    </v-layout>
+  </v-container>
   </div>
+</v-app>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "HelloWorld",
-  props: {
-    msg: String
+
+  data: () => ({
+    workout_Select: "Chest",
+
+    Workoutheaders: [
+      {
+        text: "Workout Name",
+        align: "left",
+        sortable: true,
+        value: "workoutName"
+      },
+      { text: "Main Muscle Group", value: "mainMuscleGroup" },
+      { text: "Detailed Muscle Group", value: "detailedMuscleGroup" },
+      { text: "Other Muscle Group", value: "otherMuscleGroup" },
+      { text: "Type", value: "type" },
+      { text: "Mechanics", value: "mechanics" },
+      { text: "Equipment", value: "equipment" },
+      { text: "Difficulty", value: "difficulty" }
+    ],
+    WorkoutItems: [
+      "Glutes",
+      "Lower Legs",
+      "Abs",
+      "Triceps",
+      "Cardio",
+      "Chest",
+      "Forearm",
+      "Shoulders",
+      "Back",
+      "Upper Legs",
+      "Biceps"
+    ]
+  }),
+
+  created() {
+    //console.log("Sending API Request");
+    //this.$store.dispatch("workoutStore/getWorkouts");
+  },
+  computed: {
+    ...mapGetters({
+      workout_get: "workoutStore/workout_get"
+    })
+  },
+
+  methods: {
+    getWorkouts() {
+      console.log(this.workout_Select);
+      let workoutName = {
+        workout: this.workout_Select
+      };
+      this.$store.dispatch("workoutStore/getWorkouts", workoutName);
+    },
+
+    createWorkout() {
+      this.$router.push("/createworkout");
+    }
   }
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
